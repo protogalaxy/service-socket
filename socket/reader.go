@@ -7,6 +7,8 @@ import (
 	"github.com/golang/glog"
 )
 
+// Reader is the interface that provides reading of individual messages.
+// Every message is read as a whole, if not and error must be returned.
 type Reader interface {
 	ReadMessage() ([]byte, error)
 }
