@@ -64,7 +64,7 @@ func (r errorReader) Read(b []byte) (int, error) {
 	return 0, errors.New("error")
 }
 
-func TestSocketSendMsg(t *testing.T) {
+func TestSocketSendMsgBodyReadError(t *testing.T) {
 	t.Parallel()
 	s := service.SocketSendMsg{
 		Sockets: nil,
