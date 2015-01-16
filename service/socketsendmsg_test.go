@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -21,10 +22,9 @@ func TestSocketSendMsgMessageIsSent(t *testing.T) {
 	s := service.SocketSendMsg{
 		Sockets: reg,
 	}
-	json := `{"data":"aGVsbG8="}`
 	ps := httpservice.EmptyParams()
 	ps.Set("deviceId", "123")
-	r, _ := http.NewRequest("POST", "", strings.NewReader(json))
+	r, _ := http.NewRequest("POST", "", strings.NewReader("abc"))
 	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), w, r)
 	if err != nil {
 		t.Fatalf("Expecting no error but got: %s", err)
@@ -58,30 +58,20 @@ func TestSocketSendMsgInvalidDeviceId(t *testing.T) {
 	}
 }
 
-func TestSocketSendMsgInvalidJsonBody(t *testing.T) {
-	t.Parallel()
-	s := service.SocketSendMsg{
-		Sockets: nil,
-	}
-	json := `{"data:"aGVsbG8="}`
-	ps := httpservice.EmptyParams()
-	ps.Set("deviceId", "123")
-	r, _ := http.NewRequest("POST", "", strings.NewReader(json))
-	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), nil, r)
-	if err == nil {
-		t.Fatal("Expecting error but got none")
-	}
+type errorReader struct{}
+
+func (r errorReader) Read(b []byte) (int, error) {
+	return 0, errors.New("error")
 }
 
-func TestSocketSendMsgInvalidDataEncoding(t *testing.T) {
+func TestSocketSendMsg(t *testing.T) {
 	t.Parallel()
 	s := service.SocketSendMsg{
 		Sockets: nil,
 	}
-	json := `{"data":"aGVsbG8"}`
 	ps := httpservice.EmptyParams()
 	ps.Set("deviceId", "123")
-	r, _ := http.NewRequest("POST", "", strings.NewReader(json))
+	r, _ := http.NewRequest("POST", "", errorReader{})
 	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), nil, r)
 	if err == nil {
 		t.Fatal("Expecting error but got none")

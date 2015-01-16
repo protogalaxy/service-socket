@@ -1,9 +1,8 @@
 package service
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -19,26 +18,15 @@ type SocketSendMsg struct {
 	Sockets *socket.SocketRegistry
 }
 
-type Message struct {
-	EncodedData string `json:"data"`
-}
-
-func decodeMessage(ps httpservice.Params, body io.ReadCloser) (socket.Message, error) {
+func decodeMessage(ps httpservice.Params, body io.Reader) (socket.Message, error) {
 	deviceId, err := strconv.ParseInt(ps.Get("deviceId"), 10, 64)
 	if err != nil {
 		return socket.Message{}, serviceerror.BadRequest("invalid device id", err)
 	}
 
-	decoder := json.NewDecoder(body)
-	var message Message
-	err = decoder.Decode(&message)
+	data, err := ioutil.ReadAll(body)
 	if err != nil {
-		return socket.Message{}, serviceerror.BadRequest("problem decoding request body", err)
-	}
-
-	data, err := base64.StdEncoding.DecodeString(message.EncodedData)
-	if err != nil {
-		return socket.Message{}, serviceerror.BadRequest("invalid base64 data encoding", err)
+		return socket.Message{}, serviceerror.InternalServerError("error reading request body", err)
 	}
 
 	return socket.Message{
