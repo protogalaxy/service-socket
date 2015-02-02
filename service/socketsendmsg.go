@@ -15,7 +15,7 @@ import (
 
 // SocketSendMsg is a service that provides sending messages to registered sockets.
 type SocketSendMsg struct {
-	Sockets *socket.RegistryServer
+	Sockets socket.Registry
 }
 
 func decodeMessage(ps httpservice.Params, v *socket.Message, body io.Reader) error {

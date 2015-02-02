@@ -74,10 +74,10 @@ func (r *RegistryServer) Run() {
 				glog.Warningf("Socket not found: %s", m.SocketID)
 			}
 		case m := <-r.register:
-			glog.Infof("Registering socket id=%d", m.SocketId)
+			glog.Infof("Registering socket: %d", m.SocketId)
 			r.activeSockets[m.SocketId] = m.Messages
 		case socketId := <-r.unregister:
-			glog.Infof("Unregistering socket id=%d", socketId)
+			glog.Infof("Unregistering socket: %d", socketId)
 			delete(r.activeSockets, socketId)
 		}
 	}
