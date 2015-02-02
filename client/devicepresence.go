@@ -34,7 +34,7 @@ type DevicePresenceClient struct {
 func (c *DevicePresenceClient) SetDeviceStatus(ctx context.Context, deviceID socket.ID, userID string, status Status) error {
 	cmd := cuirass.NewCommand("SetDeviceStatus", func(ctx context.Context) (interface{}, error) {
 		requestJson := fmt.Sprintf(`{"user_id": "%s", "status": "%s"}`, userID, status)
-		url := fmt.Sprintf("http://localhost:10000/status/websocket/%d", deviceID)
+		url := fmt.Sprintf("http://localhost:10000/status/websocket/%s", deviceID)
 		req, err := http.NewRequest("PUT", url, strings.NewReader(requestJson))
 		req.Header.Set("Content-Type", "application/json")
 		if err != nil {

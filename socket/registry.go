@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
+	"strconv"
 	"sync"
 
 	"github.com/golang/glog"
@@ -12,6 +13,15 @@ import (
 
 // ID identifies the registered socket in the registry.
 type ID int64
+
+func (i ID) String() string {
+	return fmt.Sprintf("%x", int64(i))
+}
+
+func ParseID(v string) (ID, error) {
+	id, err := strconv.ParseInt(v, 16, 64)
+	return ID(id), err
+}
 
 // Registry allows sockets to register themselves with a channel they want to receive on
 // and all the received messages will be routed to the correct socket's channel.
@@ -74,10 +84,10 @@ func (r *RegistryServer) Run() {
 				glog.Warningf("Socket not found: %s", m.SocketID)
 			}
 		case m := <-r.register:
-			glog.Infof("Registering socket: %d", m.SocketId)
+			glog.Infof("Registering socket: %s", m.SocketId)
 			r.activeSockets[m.SocketId] = m.Messages
 		case socketId := <-r.unregister:
-			glog.Infof("Unregistering socket: %d", socketId)
+			glog.Infof("Unregistering socket: %s", socketId)
 			delete(r.activeSockets, socketId)
 		}
 	}

@@ -40,7 +40,7 @@ func (h *ConnectionHandler) Handler() websocket.Handler {
 		if err != nil {
 			glog.Errorf("Could not register socket: %s", err)
 		}
-		glog.V(2).Infof("New websocket connection %d", socketID)
+		glog.V(2).Infof("New websocket connection %s", socketID)
 
 		defer func() {
 			done := make(chan struct{})
@@ -50,7 +50,7 @@ func (h *ConnectionHandler) Handler() websocket.Handler {
 		}()
 
 		userID := "user1"
-		glog.V(2).Infof("Athenticated user %s on websocket connection %d", userID, socketID)
+		glog.V(2).Infof("Athenticated user %s on websocket connection %s", userID, socketID)
 
 		ctx := context.Background()
 		err = h.DevicePresenceClient.SetDeviceStatus(ctx, socketID, userID, client.Online)

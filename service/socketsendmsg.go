@@ -4,7 +4,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/arjantop/saola/httpservice"
 	"github.com/golang/glog"
@@ -19,7 +18,7 @@ type SocketSendMsg struct {
 }
 
 func decodeMessage(ps httpservice.Params, v *socket.Message, body io.Reader) error {
-	deviceID, err := strconv.ParseInt(ps.Get("deviceID"), 10, 64)
+	deviceID, err := socket.ParseID(ps.Get("deviceID"))
 	if err != nil {
 		eres := serviceerror.BadRequest("invalid_request", "Invalid device id")
 		eres.Cause = err
@@ -31,7 +30,7 @@ func decodeMessage(ps httpservice.Params, v *socket.Message, body io.Reader) err
 		return serviceerror.InternalServerError("server_error", "Unable to read request body", err)
 	}
 
-	v.SocketID = socket.ID(deviceID)
+	v.SocketID = deviceID
 	v.Data = data
 	return nil
 }
