@@ -13,31 +13,33 @@ import (
 	"golang.org/x/net/context"
 )
 
-// SeocketSendMsg is a service that provides sending messages to registered sockets.
+// SocketSendMsg is a service that provides sending messages to registered sockets.
 type SocketSendMsg struct {
-	Sockets *socket.SocketRegistry
+	Sockets *socket.RegistryServer
 }
 
-func decodeMessage(ps httpservice.Params, body io.Reader) (socket.Message, error) {
-	deviceId, err := strconv.ParseInt(ps.Get("deviceId"), 10, 64)
+func decodeMessage(ps httpservice.Params, v *socket.Message, body io.Reader) error {
+	deviceID, err := strconv.ParseInt(ps.Get("deviceID"), 10, 64)
 	if err != nil {
-		return socket.Message{}, serviceerror.BadRequest("invalid device id", err)
+		eres := serviceerror.BadRequest("invalid_request", "Invalid device id")
+		eres.Cause = err
+		return eres
 	}
 
 	data, err := ioutil.ReadAll(body)
 	if err != nil {
-		return socket.Message{}, serviceerror.InternalServerError("error reading request body", err)
+		return serviceerror.InternalServerError("server_error", "Unable to read request body", err)
 	}
 
-	return socket.Message{
-		SocketId: socket.Id(deviceId),
-		Data:     data,
-	}, nil
+	v.SocketID = socket.ID(deviceID)
+	v.Data = data
+	return nil
 }
 
 // DoHTTP implements saola.HttpService.
 func (h *SocketSendMsg) DoHTTP(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	msg, err := decodeMessage(httpservice.GetParams(ctx), r.Body)
+	var msg socket.Message
+	err := decodeMessage(httpservice.GetParams(ctx), &msg, r.Body)
 	if err != nil {
 		return err
 	}
@@ -49,7 +51,7 @@ func (h *SocketSendMsg) DoHTTP(ctx context.Context, w http.ResponseWriter, r *ht
 	}
 
 	w.WriteHeader(http.StatusAccepted)
-	w.Header().Set("Content-Type", "application/json; utf-8")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Write([]byte("{}\n"))
 	return nil
 }
@@ -59,6 +61,7 @@ func (h *SocketSendMsg) Do(ctx context.Context) error {
 	return httpservice.Do(h, ctx)
 }
 
+// Name implements saola.Service.
 func (h *SocketSendMsg) Name() string {
 	return "websocketsendmessage"
 }

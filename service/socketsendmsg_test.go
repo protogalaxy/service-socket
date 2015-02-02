@@ -23,7 +23,7 @@ func TestSocketSendMsgMessageIsSent(t *testing.T) {
 		Sockets: reg,
 	}
 	ps := httpservice.EmptyParams()
-	ps.Set("deviceId", "123")
+	ps.Set("deviceID", "123")
 	r, _ := http.NewRequest("POST", "", strings.NewReader("abc"))
 	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), w, r)
 	if err != nil {
@@ -37,20 +37,20 @@ func TestSocketSendMsgMessageIsSent(t *testing.T) {
 	}
 }
 
-func TestSocketSendMsgInvalidDeviceId(t *testing.T) {
+func TestSocketSendMsgInvalidDeviceID(t *testing.T) {
 	t.Parallel()
 	s := service.SocketSendMsg{
 		Sockets: nil,
 	}
 	ps := httpservice.EmptyParams()
-	ps.Set("deviceId", "abc")
+	ps.Set("deviceID", "abc")
 	r, _ := http.NewRequest("POST", "", nil)
 	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), nil, r)
 	if err == nil {
 		t.Fatal("Expecting error but got none")
 	}
 
-	ps.Set("deviceId", "")
+	ps.Set("deviceID", "")
 	r, _ = http.NewRequest("POST", "", nil)
 	err = s.DoHTTP(httpservice.WithParams(context.Background(), ps), nil, r)
 	if err == nil {
@@ -70,7 +70,7 @@ func TestSocketSendMsgBodyReadError(t *testing.T) {
 		Sockets: nil,
 	}
 	ps := httpservice.EmptyParams()
-	ps.Set("deviceId", "123")
+	ps.Set("deviceID", "123")
 	r, _ := http.NewRequest("POST", "", errorReader{})
 	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), nil, r)
 	if err == nil {

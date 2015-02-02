@@ -42,10 +42,10 @@ func TestSocketRegistrySendMessage(t *testing.T) {
 	}
 }
 
-func socketSendMessage(t *testing.T, msgs chan<- socket.Message, socketId socket.Id, data string) {
+func socketSendMessage(t *testing.T, msgs chan<- socket.Message, socketId socket.ID, data string) {
 	select {
 	case msgs <- socket.Message{
-		SocketId: socketId,
+		SocketID: socketId,
 		Data:     []byte(data),
 	}:
 	case <-time.After(time.Millisecond):
