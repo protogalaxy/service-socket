@@ -36,10 +36,10 @@ func (c *DevicePresenceClient) SetDeviceStatus(ctx context.Context, deviceID soc
 		requestJson := fmt.Sprintf(`{"user_id": "%s", "status": "%s"}`, userID, status)
 		url := fmt.Sprintf("http://localhost:10000/status/websocket/%s", deviceID)
 		req, err := http.NewRequest("PUT", url, strings.NewReader(requestJson))
-		req.Header.Set("Content-Type", "application/json")
 		if err != nil {
 			glog.Fatal("Problem creating request: ", err)
 		}
+		req.Header.Set("Content-Type", "application/json; charset=utf-8")
 
 		res, err := c.Client.Do(ctx, req)
 		if res.StatusCode == http.StatusOK {

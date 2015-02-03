@@ -3,11 +3,6 @@
 	"GoVersion": "go1.4.1",
 	"Deps": [
 		{
-			"ImportPath": "code.google.com/p/go-uuid/uuid",
-			"Comment": "null-12",
-			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
-		},
-		{
 			"ImportPath": "github.com/arjantop/cuirass",
 			"Rev": "1b8c519aca43421bf34f1dfd145f4c452be12110"
 		},

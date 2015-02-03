@@ -43,7 +43,7 @@ func TestSocketSendMsgInvalidDeviceID(t *testing.T) {
 		Sockets: nil,
 	}
 	ps := httpservice.EmptyParams()
-	ps.Set("deviceID", "abc")
+	ps.Set("deviceID", "z")
 	r, _ := http.NewRequest("POST", "", nil)
 	err := s.DoHTTP(httpservice.WithParams(context.Background(), ps), nil, r)
 	if err == nil {
