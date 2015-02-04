@@ -33,10 +33,10 @@ type MessageWriter struct {
 }
 
 // NewMessageWriter constructs a new MessageWriter for a given writer.
-func NewMessageWriter(w io.Writer) *MessageWriter {
+func NewMessageWriter(w io.Writer, msgs chan []byte) *MessageWriter {
 	return &MessageWriter{
 		w:        w,
-		messages: make(chan []byte),
+		messages: msgs,
 		close:    make(chan struct{}),
 	}
 }
@@ -68,6 +68,7 @@ func (w *MessageWriter) Run() {
 
 // DiscardUntil closes the writer and then consumes the messages from writer's message
 // channel until provided done channel is not closed.
+// TODO: remove
 func (w *MessageWriter) DiscardUntil(done chan struct{}) {
 	w.Close()
 	for {

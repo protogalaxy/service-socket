@@ -36,7 +36,7 @@ func (m *CloserMock) Close() error {
 
 func TestMessageWriterClosesReader(t *testing.T) {
 	t.Parallel()
-	w := socket.NewMessageWriter(nil)
+	w := socket.NewMessageWriter(nil, nil)
 	var called bool
 	w.Reader = &CloserMock{
 		CloseFunc: func() error {
@@ -63,7 +63,7 @@ func TestMessageWriterClosesReader(t *testing.T) {
 func TestMessageWriterMessagesAreWritten(t *testing.T) {
 	t.Parallel()
 	var writer bytes.Buffer
-	w := socket.NewMessageWriter(&writer)
+	w := socket.NewMessageWriter(&writer, make(chan []byte))
 	done := make(chan struct{})
 	go func() {
 		w.Run()
@@ -85,7 +85,7 @@ func TestMessageWriterMessagesAreWritten(t *testing.T) {
 func TestMessagesAreDiscarded(t *testing.T) {
 	t.Parallel()
 	var writer bytes.Buffer
-	w := socket.NewMessageWriter(&writer)
+	w := socket.NewMessageWriter(&writer, make(chan []byte))
 	done := make(chan struct{})
 	go func() {
 		w.Run()
@@ -123,7 +123,7 @@ func (w *WriterError) Write(b []byte) (int, error) {
 func TestMessageWriterExitOnWriteError(t *testing.T) {
 	t.Parallel()
 	writer := &WriterError{}
-	w := socket.NewMessageWriter(writer)
+	w := socket.NewMessageWriter(writer, make(chan []byte))
 	done := make(chan struct{})
 	go func() {
 		w.Run()

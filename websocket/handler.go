@@ -18,7 +18,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/protogalaxy/service-socket/client"
 	"github.com/protogalaxy/service-socket/socket"
-	"golang.org/x/net/context"
 	"golang.org/x/net/websocket"
 )
 
@@ -44,42 +43,33 @@ func (h *ConnectionHandler) Handler() websocket.Handler {
 	return websocket.Handler(func(raw *websocket.Conn) {
 		ws := &MsgConn{raw}
 		defer ws.Close()
-
-		writer := socket.NewMessageWriter(ws)
-		reader := socket.NewMessageReader(ws)
-		writer.Reader = reader
-		reader.Writer = writer
-
-		socketID, err := h.Registry.Register(writer.Messages())
-		if err != nil {
-			glog.Errorf("Could not register socket: %s", err)
+		s := States{
+			Registry:             h.Registry,
+			DevicePresenceClient: h.DevicePresenceClient,
+			Conn:                 ws,
+			Messages:             make(chan []byte),
 		}
-		glog.V(2).Infof("New websocket connection %s", socketID)
 
 		defer func() {
 			done := make(chan struct{})
-			go writer.DiscardUntil(done)
-			h.Registry.Unregister(socketID)
+			go discard(s.Messages, done)
+			if s.socketID != 0 {
+				h.Registry.Unregister(s.socketID)
+			}
 			close(done)
 		}()
 
-		userID := "user1"
-		glog.V(2).Infof("Athenticated user %s on websocket connection %s", userID, socketID)
+		Run(&s)
+	})
+}
 
-		ctx := context.Background()
-		err = h.DevicePresenceClient.SetDeviceStatus(ctx, socketID, userID, client.Online)
-		if err != nil {
-			glog.Errorf("Problem setting device status: %s", err)
+func discard(c chan []byte, done chan struct{}) {
+	for {
+		select {
+		case <-c:
+			glog.V(4).Infof("Discarding message")
+		case <-done:
 			return
 		}
-
-		go writer.Run()
-		go func() {
-			for {
-				// TODO: Don't discard all messages
-				<-reader.Messages()
-			}
-		}()
-		reader.Run()
-	})
+	}
 }
