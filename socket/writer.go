@@ -66,21 +66,6 @@ func (w *MessageWriter) Run() {
 	}
 }
 
-// DiscardUntil closes the writer and then consumes the messages from writer's message
-// channel until provided done channel is not closed.
-// TODO: remove
-func (w *MessageWriter) DiscardUntil(done chan struct{}) {
-	w.Close()
-	for {
-		select {
-		case <-w.messages:
-			glog.V(4).Infof("Discarding message")
-		case <-done:
-			return
-		}
-	}
-}
-
 // Messages returns a send only channel of messages that will be written.
 func (w *MessageWriter) Messages() chan<- []byte {
 	return w.messages

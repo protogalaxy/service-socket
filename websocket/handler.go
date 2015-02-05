@@ -15,7 +15,6 @@
 package websocket
 
 import (
-	"github.com/golang/glog"
 	"github.com/protogalaxy/service-socket/client"
 	"github.com/protogalaxy/service-socket/socket"
 	"golang.org/x/net/websocket"
@@ -47,29 +46,15 @@ func (h *ConnectionHandler) Handler() websocket.Handler {
 			Registry:             h.Registry,
 			DevicePresenceClient: h.DevicePresenceClient,
 			Conn:                 ws,
-			Messages:             make(chan []byte),
+			Messages:             make(chan []byte, 10),
 		}
 
 		defer func() {
-			done := make(chan struct{})
-			go discard(s.Messages, done)
 			if s.socketID != 0 {
 				h.Registry.Unregister(s.socketID)
 			}
-			close(done)
 		}()
 
 		Run(&s)
 	})
-}
-
-func discard(c chan []byte, done chan struct{}) {
-	for {
-		select {
-		case <-c:
-			glog.V(4).Infof("Discarding message")
-		case <-done:
-			return
-		}
-	}
 }

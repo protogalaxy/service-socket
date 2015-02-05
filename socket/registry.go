@@ -93,7 +93,12 @@ func (r *RegistryServer) Run() {
 			return
 		case m := <-r.messages:
 			if c, ok := r.activeSockets[m.SocketID]; ok {
-				c <- m.Data
+				select {
+				case c <- m.Data:
+					glog.V(4).Info("Message sent to socket")
+				default:
+					glog.Warning("Socket queue full")
+				}
 			} else {
 				glog.Warningf("Socket not found: %s", m.SocketID)
 			}

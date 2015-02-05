@@ -21,6 +21,20 @@ import (
 	"github.com/protogalaxy/service-socket/socket"
 )
 
+func TestSocketIDTOString(t *testing.T) {
+	sid := socket.ID(123456)
+	if s := sid.String(); s != "1e240" {
+		t.Errorf("Socket ID should be converted to string but got: %s", s)
+	}
+}
+
+func TestSocketParseID(t *testing.T) {
+	sid := socket.ID(123456)
+	if psid, err := socket.ParseID(sid.String()); err != nil || sid != psid {
+		t.Errorf("Socket id should be parsed from string but got: %d", psid)
+	}
+}
+
 func TestSocketRegistrySendMessage(t *testing.T) {
 	t.Parallel()
 	reg := socket.NewRegistry()
@@ -47,6 +61,39 @@ func TestSocketRegistrySendMessage(t *testing.T) {
 
 	checkReceivedMessage(t, c1, "abc")
 	checkReceivedMessage(t, c2, "def")
+
+	reg.Close()
+	select {
+	case <-done:
+	case <-time.After(time.Millisecond):
+		t.Fatal("Registry not closing")
+	}
+}
+
+func TestSocketRegistryMessageQueueFull(t *testing.T) {
+	t.Parallel()
+	reg := socket.NewRegistry()
+	done := make(chan struct{})
+	go func() {
+		reg.Run()
+		close(done)
+	}()
+
+	c1 := make(chan []byte)
+	id1, err := reg.Register(c1)
+	if err != nil {
+		t.Errorf("Registering socket should not fail but got: %s", err)
+	}
+
+	socketSendMessage(t, reg.Messages(), id1, "abc")
+
+	time.Sleep(time.Millisecond) // Wait for the send to be processed
+
+	select {
+	case m := <-c1:
+		t.Errorf("No messages should be received but got: %s", m)
+	case <-time.After(time.Millisecond):
+	}
 
 	reg.Close()
 	select {

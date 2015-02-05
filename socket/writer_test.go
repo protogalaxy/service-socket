@@ -82,38 +82,6 @@ func TestMessageWriterMessagesAreWritten(t *testing.T) {
 	}
 }
 
-func TestMessagesAreDiscarded(t *testing.T) {
-	t.Parallel()
-	var writer bytes.Buffer
-	w := socket.NewMessageWriter(&writer, make(chan []byte))
-	done := make(chan struct{})
-	go func() {
-		w.Run()
-		close(done)
-	}()
-	dc := make(chan struct{})
-	discardDone := make(chan struct{})
-	go func() {
-		w.DiscardUntil(dc)
-		close(discardDone)
-	}()
-	select {
-	case <-done:
-		sendMessage(t, w.Messages(), "msg")
-		close(dc)
-		select {
-		case <-discardDone:
-			if writer.String() != "" {
-				t.Fatalf("No messages should be written but got '%s'", writer.String())
-			}
-		case <-time.After(time.Millisecond):
-			t.Fatal("Discard not finishing")
-		}
-	case <-time.After(time.Millisecond):
-		t.Fatal("Writer was not closed")
-	}
-}
-
 type WriterError struct{}
 
 func (w *WriterError) Write(b []byte) (int, error) {
