@@ -1,6 +1,9 @@
 {
 	"ImportPath": "github.com/protogalaxy/service-socket",
-	"GoVersion": "go1.4.1",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/arjantop/cuirass",
@@ -15,16 +18,20 @@
 			"Rev": "2d2925b23249d202e676e28af719c278f4ee7d40"
 		},
 		{
+			"ImportPath": "github.com/bradfitz/http2",
+			"Rev": "2609cc0d65ebda013df59aaa43b9b6f3a7a686f5"
+		},
+		{
 			"ImportPath": "github.com/golang/glog",
 			"Rev": "44145f04b68cf362d9c4df2182967c2275eaefed"
 		},
 		{
-			"ImportPath": "github.com/julienschmidt/httprouter",
-			"Rev": "46807412fe50aaceb73bb57061c2230fd26a1640"
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "c22ae3cf020a21ebb7ae566dccbe90fc8ea4f9ea"
 		},
 		{
-			"ImportPath": "github.com/protogalaxy/common/serviceerror",
-			"Rev": "466cdb29e9f1f02750a45afa2ba829b20cff0912"
+			"ImportPath": "github.com/julienschmidt/httprouter",
+			"Rev": "46807412fe50aaceb73bb57061c2230fd26a1640"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
@@ -33,6 +40,22 @@
 		{
 			"ImportPath": "golang.org/x/net/websocket",
 			"Rev": "67f25490433376b5f7da086c0b9283fcdeca3a7b"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "a0fac97f6e7d704570d0c97f9a9bec59989b2576"
+		},
+		{
+			"ImportPath": "google.golang.org/cloud/compute/metadata",
+			"Rev": "fffe461e194e54255fea3954c7197e300dc87811"
+		},
+		{
+			"ImportPath": "google.golang.org/cloud/internal",
+			"Rev": "fffe461e194e54255fea3954c7197e300dc87811"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc",
+			"Rev": "575a9b2af86b7bd65453191f9aaed7266c327376"
 		}
 	]
 }

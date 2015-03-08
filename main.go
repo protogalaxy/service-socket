@@ -16,22 +16,20 @@ package main
 
 import (
 	"flag"
-	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"time"
 
 	"github.com/arjantop/cuirass"
-	"github.com/arjantop/saola"
 	"github.com/arjantop/saola/httpservice"
 	"github.com/arjantop/vaquita"
 	"github.com/golang/glog"
-	"github.com/protogalaxy/common/serviceerror"
 	"github.com/protogalaxy/service-socket/client"
-	"github.com/protogalaxy/service-socket/service"
 	"github.com/protogalaxy/service-socket/socket"
 	"github.com/protogalaxy/service-socket/websocket"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -56,23 +54,19 @@ func main() {
 		Registry:             socketRegistry,
 		DevicePresenceClient: devicePresence,
 	}
-
 	go func() {
 		http.Handle("/", connHandler.Handler())
-		glog.Fatal(http.ListenAndServe(":10300", nil))
+		glog.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 
-	endpoint := httpservice.NewEndpoint()
+	s, err := net.Listen("tcp", ":9090")
+	if err != nil {
+		glog.Fatalf("failed to listen: %v", err)
+	}
 
-	endpoint.POST("/websocket/:deviceID/send", saola.Apply(
-		&service.SocketSendMsg{
-			Sockets: socketRegistry,
-		},
-		httpservice.NewCancellationFilter(),
-		serviceerror.NewErrorResponseFilter(),
-		serviceerror.NewErrorLoggerFilter()))
-
-	log.Fatal(httpservice.Serve(":10301", saola.Apply(
-		endpoint,
-		httpservice.NewStdRequestLogFilter())))
+	grpcServer := grpc.NewServer()
+	socket.RegisterSenderServer(grpcServer, &socket.Sender{
+		Sockets: socketRegistry,
+	})
+	grpcServer.Serve(s)
 }

@@ -2,7 +2,7 @@ FROM debian:wheezy
 
 MAINTAINER The Protogalaxy Project
 
-EXPOSE 10100
+EXPOSE 8080 9090
 
 ENTRYPOINT ["./main", "-logtostderr", "-v=4"]
 
