@@ -15,14 +15,14 @@
 package websocket
 
 import (
-	"github.com/protogalaxy/service-socket/client"
+	"github.com/protogalaxy/service-socket/devicepresence"
 	"github.com/protogalaxy/service-socket/socket"
 	"golang.org/x/net/websocket"
 )
 
 type ConnectionHandler struct {
-	Registry             *socket.RegistryServer
-	DevicePresenceClient client.DevicePresence
+	Registry       *socket.RegistryServer
+	DevicePresence devicepresence.PresenceManagerClient
 }
 
 type MsgConn struct {
@@ -43,12 +43,13 @@ func (h *ConnectionHandler) Handler() websocket.Handler {
 		ws := &MsgConn{raw}
 		defer ws.Close()
 		s := States{
-			Registry:             h.Registry,
-			DevicePresenceClient: h.DevicePresenceClient,
-			Conn:                 ws,
-			Messages:             make(chan []byte, 10),
+			Registry:       h.Registry,
+			DevicePresence: h.DevicePresence,
+			Conn:           ws,
+			Messages:       make(chan []byte, 10),
 		}
 
+		// TODO: set device status to offline
 		defer func() {
 			if s.socketID != 0 {
 				h.Registry.Unregister(s.socketID)

@@ -22,11 +22,8 @@ import (
 	_ "net/http/pprof"
 	"time"
 
-	"github.com/arjantop/cuirass"
-	"github.com/arjantop/saola/httpservice"
-	"github.com/arjantop/vaquita"
 	"github.com/golang/glog"
-	"github.com/protogalaxy/service-socket/client"
+	"github.com/protogalaxy/service-socket/devicepresence"
 	"github.com/protogalaxy/service-socket/socket"
 	"github.com/protogalaxy/service-socket/websocket"
 	"google.golang.org/grpc"
@@ -36,23 +33,19 @@ func main() {
 	flag.Parse()
 	rand.Seed(time.Now().UnixNano())
 
-	config := vaquita.NewEmptyMapConfig()
-	exec := cuirass.NewExecutor(config)
-
 	socketRegistry := socket.NewRegistry()
 	go socketRegistry.Run()
 
-	httpClient := &httpservice.Client{
-		Transport: &http.Transport{},
+	conn, err := grpc.Dial("localhost:9091")
+	if err != nil {
+		glog.Fatalf("could not connect: %v", err)
 	}
-	devicePresence := &client.DevicePresenceClient{
-		Client:   httpClient,
-		Executor: exec,
-	}
+	defer conn.Close()
+	dpc := devicepresence.NewPresenceManagerClient(conn)
 
 	connHandler := websocket.ConnectionHandler{
-		Registry:             socketRegistry,
-		DevicePresenceClient: devicePresence,
+		Registry:       socketRegistry,
+		DevicePresence: dpc,
 	}
 	go func() {
 		http.Handle("/", connHandler.Handler())

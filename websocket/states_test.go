@@ -19,9 +19,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/protogalaxy/service-socket/client"
+	"github.com/protogalaxy/service-socket/devicepresence"
 	"github.com/protogalaxy/service-socket/socket"
 	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 type ConnMock struct {
@@ -129,27 +130,30 @@ func TestStatesRegisterSocketError(t *testing.T) {
 }
 
 type DevicePresenceMock struct {
-	OnSetDeviceStatus func(ctx context.Context, deviceId socket.ID, userID string, status client.Status) error
+	OnSetStatus func(context.Context, *devicepresence.StatusRequest) (*devicepresence.StatusReply, error)
 }
 
-func (m *DevicePresenceMock) SetDeviceStatus(ctx context.Context, deviceID socket.ID, userID string, status client.Status) error {
-	return m.OnSetDeviceStatus(ctx, deviceID, userID, status)
+func (m *DevicePresenceMock) SetStatus(ctx context.Context, req *devicepresence.StatusRequest, opts ...grpc.CallOption) (*devicepresence.StatusReply, error) {
+	return m.OnSetStatus(ctx, req)
 }
 
 func TestStatesSetDeviceStatus(t *testing.T) {
 	s := &States{
-		DevicePresenceClient: &DevicePresenceMock{
-			OnSetDeviceStatus: func(ctx context.Context, deviceID socket.ID, userID string, status client.Status) error {
-				if deviceID != socket.ID(9) {
-					t.Errorf("Unexpected device id: %s", deviceID)
+		DevicePresence: &DevicePresenceMock{
+			OnSetStatus: func(ctx context.Context, req *devicepresence.StatusRequest) (*devicepresence.StatusReply, error) {
+				if req.Device == nil {
+					t.Errorf("Missing device")
 				}
-				if userID != "13" {
-					t.Errorf("Unexpected user id: %s", userID)
+				expected := devicepresence.Device{
+					Id:     "9",
+					Type:   devicepresence.Device_WS,
+					UserId: "13",
+					Status: devicepresence.Device_ONLINE,
 				}
-				if status != client.Online {
-					t.Errorf("Unexpected device status: %s", status)
+				if expected != *req.Device {
+					t.Errorf("Unexpected device: %#v != %#v", expected, req.Device)
 				}
-				return nil
+				return &devicepresence.StatusReply{}, nil
 			},
 		},
 	}
@@ -164,9 +168,9 @@ func TestStatesSetDeviceStatus(t *testing.T) {
 
 func TestStatesSetDeviceStatusError(t *testing.T) {
 	s := &States{
-		DevicePresenceClient: &DevicePresenceMock{
-			OnSetDeviceStatus: func(ctx context.Context, deviceID socket.ID, userID string, status client.Status) error {
-				return errors.New("error")
+		DevicePresence: &DevicePresenceMock{
+			OnSetStatus: func(ctx context.Context, req *devicepresence.StatusRequest) (*devicepresence.StatusReply, error) {
+				return nil, errors.New("error")
 			},
 		},
 	}

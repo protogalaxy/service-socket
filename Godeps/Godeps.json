@@ -6,18 +6,6 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/arjantop/cuirass",
-			"Rev": "1b8c519aca43421bf34f1dfd145f4c452be12110"
-		},
-		{
-			"ImportPath": "github.com/arjantop/saola",
-			"Rev": "a902961218a990b828c2c8a43223b482ba543554"
-		},
-		{
-			"ImportPath": "github.com/arjantop/vaquita",
-			"Rev": "2d2925b23249d202e676e28af719c278f4ee7d40"
-		},
-		{
 			"ImportPath": "github.com/bradfitz/http2",
 			"Rev": "2609cc0d65ebda013df59aaa43b9b6f3a7a686f5"
 		},
@@ -28,10 +16,6 @@
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "c22ae3cf020a21ebb7ae566dccbe90fc8ea4f9ea"
-		},
-		{
-			"ImportPath": "github.com/julienschmidt/httprouter",
-			"Rev": "46807412fe50aaceb73bb57061c2230fd26a1640"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",

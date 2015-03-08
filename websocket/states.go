@@ -19,7 +19,7 @@ import (
 	"net/http"
 
 	"github.com/golang/glog"
-	"github.com/protogalaxy/service-socket/client"
+	"github.com/protogalaxy/service-socket/devicepresence"
 	"github.com/protogalaxy/service-socket/socket"
 	"golang.org/x/net/context"
 )
@@ -34,12 +34,12 @@ func Run(s *States) {
 }
 
 type States struct {
-	Registry             socket.Registry
-	DevicePresenceClient client.DevicePresence
-	Conn                 Conn
-	Messages             chan []byte
-	socketID             socket.ID
-	userID               string
+	Registry       socket.Registry
+	DevicePresence devicepresence.PresenceManagerClient
+	Conn           Conn
+	Messages       chan []byte
+	socketID       socket.ID
+	userID         string
 }
 
 type Conn interface {
@@ -82,10 +82,19 @@ func (s *States) registerSocket() *StateFunc {
 }
 
 func (s *States) setDeviceStatus() *StateFunc {
+	// TODO: add timeout
 	ctx := context.Background()
-	err := s.DevicePresenceClient.SetDeviceStatus(ctx, s.socketID, s.userID, client.Online)
+	_, err := s.DevicePresence.SetStatus(ctx, &devicepresence.StatusRequest{
+		Device: &devicepresence.Device{
+			Id:     s.socketID.String(),
+			Type:   devicepresence.Device_WS,
+			UserId: s.userID,
+			Status: devicepresence.Device_ONLINE,
+		},
+	})
 	if err != nil {
 		glog.Errorf("Problem setting device status: %s", err)
+		// TODO: transition to disconnected state
 		return nil
 	}
 	return &HandleMessages
