@@ -19,14 +19,14 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
-	_ "net/http/pprof"
 	"time"
 
-	"github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/google.golang.org/grpc"
 	"github.com/protogalaxy/service-socket/devicepresence"
+	"github.com/protogalaxy/service-socket/messagebroker"
 	"github.com/protogalaxy/service-socket/socket"
 	"github.com/protogalaxy/service-socket/websocket"
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -43,10 +43,19 @@ func main() {
 	defer conn.Close()
 	dpc := devicepresence.NewPresenceManagerClient(conn)
 
+	conn2, err := grpc.Dial("localhost:9092")
+	if err != nil {
+		glog.Fatalf("could not connect: %v", err)
+	}
+	defer conn2.Close()
+	mbc := messagebroker.NewBrokerClient(conn2)
+
 	connHandler := websocket.ConnectionHandler{
 		Registry:       socketRegistry,
 		DevicePresence: dpc,
+		MessageBroker:  mbc,
 	}
+
 	go func() {
 		http.Handle("/", connHandler.Handler())
 		glog.Fatal(http.ListenAndServe(":8080", nil))

@@ -31,4 +31,4 @@ PG_ROOT=$(dirname "${BASH_SOURCE}")/..
 source "$PG_ROOT/build/common.sh"
 
 echo "+++ Building executables ..."
-godep go build -o "${TARGET_BIN}/main"
+go build -o "${TARGET_BIN}/main"

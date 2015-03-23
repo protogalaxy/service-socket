@@ -18,7 +18,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/golang/glog"
 )
 
 // MessageWriter is a worker that writes the messages to the specified io.Writer.

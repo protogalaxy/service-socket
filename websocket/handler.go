@@ -15,14 +15,16 @@
 package websocket
 
 import (
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/golang.org/x/net/websocket"
 	"github.com/protogalaxy/service-socket/devicepresence"
+	"github.com/protogalaxy/service-socket/messagebroker"
 	"github.com/protogalaxy/service-socket/socket"
-	"golang.org/x/net/websocket"
 )
 
 type ConnectionHandler struct {
 	Registry       *socket.RegistryServer
 	DevicePresence devicepresence.PresenceManagerClient
+	MessageBroker  messagebroker.BrokerClient
 }
 
 type MsgConn struct {
@@ -45,6 +47,7 @@ func (h *ConnectionHandler) Handler() websocket.Handler {
 		s := States{
 			Registry:       h.Registry,
 			DevicePresence: h.DevicePresence,
+			MessageBroker:  h.MessageBroker,
 			Conn:           ws,
 			Messages:       make(chan []byte, 10),
 		}

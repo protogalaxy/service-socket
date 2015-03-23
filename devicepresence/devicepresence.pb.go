@@ -15,11 +15,11 @@ It has these top-level messages:
 */
 package devicepresence
 
-import proto "github.com/golang/protobuf/proto"
+import proto "github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/golang/protobuf/proto"
 
 import (
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
+	context "github.com/protogalaxy/service-socket/Godeps/_workspace/src/golang.org/x/net/context"
+	grpc "github.com/protogalaxy/service-socket/Godeps/_workspace/src/google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

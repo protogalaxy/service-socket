@@ -18,7 +18,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/golang/glog"
 )
 
 // Reader is the interface that provides reading of individual messages.

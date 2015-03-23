@@ -19,10 +19,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/google.golang.org/grpc"
 	"github.com/protogalaxy/service-socket/devicepresence"
 	"github.com/protogalaxy/service-socket/socket"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 type ConnMock struct {

@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/golang/glog"
 )
 
 // ID identifies the registered socket in the registry.

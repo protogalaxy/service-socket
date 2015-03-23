@@ -18,10 +18,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/golang/glog"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/golang.org/x/net/context"
 	"github.com/protogalaxy/service-socket/devicepresence"
+	"github.com/protogalaxy/service-socket/messagebroker"
 	"github.com/protogalaxy/service-socket/socket"
-	"golang.org/x/net/context"
 )
 
 type StateFunc func(*States) *StateFunc
@@ -36,6 +37,7 @@ func Run(s *States) {
 type States struct {
 	Registry       socket.Registry
 	DevicePresence devicepresence.PresenceManagerClient
+	MessageBroker  messagebroker.BrokerClient
 	Conn           Conn
 	Messages       chan []byte
 	socketID       socket.ID
@@ -109,8 +111,15 @@ func (s *States) handleMessages() *StateFunc {
 	go writer.Run()
 	go func() {
 		for {
-			// TODO: Don't discard all messages
-			<-reader.Messages()
+			// TODO: timeout
+			ctx := context.Background()
+			msg := <-reader.Messages()
+			_, err := s.MessageBroker.Route(ctx, &messagebroker.RouteRequest{
+				Data: msg,
+			})
+			if err != nil {
+				glog.Errorf("handling message: %s", err)
+			}
 		}
 	}()
 	reader.Run()

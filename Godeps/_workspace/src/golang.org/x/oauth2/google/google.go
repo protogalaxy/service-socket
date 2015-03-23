@@ -20,13 +20,13 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/jwt"
-	"google.golang.org/cloud/compute/metadata"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/golang.org/x/oauth2"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/golang.org/x/oauth2/jwt"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/google.golang.org/cloud/compute/metadata"
 )
 
-// Endpoint is Google's OAuth 2.0 endpoint.
-var Endpoint = oauth2.Endpoint{
+var Endpoint = // Endpoint is Google's OAuth 2.0 endpoint.
+oauth2.Endpoint{
 	AuthURL:  "https://accounts.google.com/o/oauth2/auth",
 	TokenURL: "https://accounts.google.com/o/oauth2/token",
 }

@@ -29,7 +29,7 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/cloud/internal"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/google.golang.org/cloud/internal"
 )
 
 type cachedValue struct {

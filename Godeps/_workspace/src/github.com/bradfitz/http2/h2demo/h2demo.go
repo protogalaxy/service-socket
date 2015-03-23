@@ -31,7 +31,7 @@ import (
 
 	"camlistore.org/pkg/googlestorage"
 	"camlistore.org/pkg/singleflight"
-	"github.com/bradfitz/http2"
+	"github.com/protogalaxy/service-socket/Godeps/_workspace/src/github.com/bradfitz/http2"
 )
 
 var (
